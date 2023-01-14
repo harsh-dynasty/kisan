@@ -27,14 +27,7 @@ export const MessagesContext = createContext();
 function App() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      name: "Harsh Soni",
-      number: "+9663473647364",
-      text: "sample text for message",
-      timeStamp: Date.now(),
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
   const handleDrawerToggle = () => {
     setOpen(true);
   };
