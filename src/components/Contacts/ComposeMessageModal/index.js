@@ -7,6 +7,8 @@ import {
   Typography,
   CircularProgress,
   IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { green } from "@mui/material/colors";
 import React, { useContext, useEffect, useState } from "react";
@@ -35,7 +37,7 @@ export const ComposeMessageModal = ({ open, handleClose }) => {
   const { setMessages } = useContext(MessagesContext);
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
-
+  const [err, setError] = useState("");
   const buttonSx = {
     ...(success && {
       bgcolor: green[500],
@@ -61,91 +63,104 @@ export const ComposeMessageModal = ({ open, handleClose }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ to: number, text: input }),
-      })
-        .then((res) => {
-          console.log(res);
-          setSuccess(true);
+      }).then((res) => {
+        if (res.status !== 200) {
+          setError("There's some error in sending message");
+          handleClose();
+          setSuccess(false);
           setLoading(false);
-
-          setMessages((prev) => {
-            const newMessages = Array.from(prev);
-            newMessages.push({
-              name,
-              number,
-              timeStamp: Date.now(),
-              text: input,
-            });
-            return newMessages;
-          });
-
           setTimeout(() => {
-            handleClose();
-            setSuccess(false);
-          }, 1000);
-        })
-        .catch((err) => console.log(err));
+            setError("");
+          }, 2000);
+          return;
+        }
+        setSuccess(true);
+        setLoading(false);
+
+        setMessages((prev) => {
+          const newMessages = Array.from(prev);
+          newMessages.push({
+            name,
+            number,
+            timeStamp: Date.now(),
+            text: input,
+          });
+          return newMessages;
+        });
+
+        setTimeout(() => {
+          handleClose();
+          setSuccess(false);
+        }, 1000);
+      });
     }
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={style}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          Compose Message
-        </Typography>
-        <TextField
-          autoFocus
-          multiline
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-        <Box
-          sx={{
-            m: 1,
-            position: "relative",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          <Button
-            variant="contained"
-            sx={buttonSx}
-            disabled={loading}
-            onClick={handleButtonClick}
+    <>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Compose Message
+          </Typography>
+          <TextField
+            autoFocus
+            multiline
+            value={input}
+            placeholder="Type message here"
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <Box
+            sx={{
+              m: 1,
+              position: "relative",
+              width: "100%",
+              textAlign: "center",
+            }}
           >
-            {success ? "Sent" : "Send Message"}
-          </Button>
-          {loading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                color: green[500],
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                marginTop: "-12px",
-                marginLeft: "-12px",
-              }}
-            />
-          )}
+            <Button
+              variant="contained"
+              sx={buttonSx}
+              disabled={loading || !input}
+              onClick={handleButtonClick}
+            >
+              {success ? "Sent" : "Send Message"}
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  color: green[500],
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-12px",
+                  marginLeft: "-12px",
+                }}
+              />
+            )}
+          </Box>
+          <IconButton
+            sx={{
+              width: "fit-content",
+              position: "absolute",
+              top: 10,
+              right: 10,
+            }}
+            onClick={handleClose}
+          >
+            <Close />
+          </IconButton>
         </Box>
-        <IconButton
-          sx={{
-            width: "fit-content",
-            position: "absolute",
-            top: 10,
-            right: 10,
-          }}
-          onClick={handleClose}
-        >
-          <Close />
-        </IconButton>
-      </Box>
-    </Modal>
+      </Modal>
+      <Snackbar open={err ? true : false} autoHideDuration={200}>
+        <Alert severity="error">{err}</Alert>
+      </Snackbar>
+    </>
   );
 };
