@@ -1,3 +1,4 @@
+import { Close } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -5,6 +6,7 @@ import {
   TextField,
   Typography,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
 import { green } from "@mui/material/colors";
 import React, { useContext, useEffect, useState } from "react";
@@ -16,7 +18,9 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: "50%",
+  maxWidth: 400,
+  minWidth: 200,
   bgcolor: "background.paper",
   display: "flex",
   flexDirection: "column",
@@ -130,6 +134,17 @@ export const ComposeMessageModal = ({ open, handleClose }) => {
             />
           )}
         </Box>
+        <IconButton
+          sx={{
+            width: "fit-content",
+            position: "absolute",
+            top: 10,
+            right: 10,
+          }}
+          onClick={handleClose}
+        >
+          <Close />
+        </IconButton>
       </Box>
     </Modal>
   );

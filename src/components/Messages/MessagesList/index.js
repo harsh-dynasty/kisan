@@ -17,7 +17,7 @@ export const MessagesList = () => {
   const { messages } = useContext(MessagesContext);
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} xl={12} md={12}>
         <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
           Messages
         </Typography>
